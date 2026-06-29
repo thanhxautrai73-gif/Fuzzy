@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline - Fuzzy App</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      background-color: #f7f6f0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+    }
+    .offline-container {
+      text-align: center;
+      padding: 30px;
+      max-width: 400px;
+      width: 100%;
+    }
+    .offline-icon {
+      font-size: 80px;
+      color: #5c4c3c;
+      margin-bottom: 20px;
+    }
+    .offline-title {
+      font-weight: 700;
+      color: #08060d;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    .offline-text {
+      color: #6b6375;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+    .btn-retry {
+      background-color: #5c4c3c;
+      color: #fff;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 25px;
+      font-weight: 600;
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+    .btn-retry:hover {
+      background-color: #4a3c2e;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-container">
+    <div class="mb-4">
+      <img class="img-fluid logo-img" src="images/logo.png" alt="logo" style="max-height: 45px; margin: 0 auto;" />
+    </div>
+    <div class="offline-icon">
+      📶
+    </div>
+    <h2 class="offline-title">Mất kết nối mạng</h2>
+    <p class="offline-text">Vui lòng kiểm tra lại kết nối Wifi hoặc 3G/4G trên thiết bị của bạn để tiếp tục trải nghiệm ứng dụng Fuzzy.</p>
+    <button onclick="window.location.reload()" class="btn btn-retry">Thử lại</button>
+  </div>
+</body>
+</html>

@@ -1,0 +1,91 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  email        String    @unique
+  password     String
+  name         String
+  phone        String?
+  dateOfBirth  String?
+  avatar       String?
+  addresses    Address[]
+  orders       Order[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Address {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String   @db.ObjectId
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  receiverName  String
+  receiverPhone String
+  province      String
+  district      String
+  ward          String
+  detailAddress String
+  isDefault     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Category {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  icon      String?   // Tên icon hoặc biểu tượng emoji
+  slug      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Product {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String
+  price       Float
+  salePrice   Float?
+  stock       Int
+  image       String      // Ảnh chính
+  images      String      // Danh sách ảnh phụ cách nhau bởi dấu phẩy
+  sizes       String      // Danh sách size cách nhau bởi dấu phẩy (vd: "S,M,L")
+  colors      String      // Danh sách màu cách nhau bởi dấu phẩy (vd: "Red,Blue")
+  categoryId  String      @db.ObjectId
+  category    Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  orderItems  OrderItem[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Order {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String      @db.ObjectId
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  totalPrice    Float
+  status        String      // PENDING, PREPARING, SHIPPING, COMPLETED, CANCELLED
+  paymentMethod String      // COD, BANK_TRANSFER, VNPAY, MOMO
+  paymentStatus String      // PAID, UNPAID
+  address       String      // Địa chỉ nhận hàng dưới dạng chuỗi JSON
+  items         OrderItem[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  orderId   String   @db.ObjectId
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String   @db.ObjectId
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity  Int
+  price     Float
+  size      String?
+  color     String?
+}
