@@ -56,6 +56,9 @@ self.addEventListener('fetch', (event) => {
   // Bỏ qua các cuộc gọi API từ Next.js
   if (event.request.url.includes('/api/')) return;
 
+  // Chỉ xử lý các yêu cầu HTTP/HTTPS (tránh lỗi cache của Chrome Extension)
+  if (!event.request.url.startsWith('http')) return;
+
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {

@@ -8,7 +8,7 @@ const Cart = () => {
 
   const handleCheckout = () => {
     if (items.length === 0) return;
-    navigate('/checkout');
+    navigate('/shipping-address');
   };
 
   return (

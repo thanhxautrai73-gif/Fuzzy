@@ -50,12 +50,22 @@ const ThemeManager = () => {
 
   useEffect(() => {
     const darkPaths = ['/', '/login', '/register'];
+    const isGlobalDark = localStorage.getItem('layout_version') === 'dark';
+
     if (darkPaths.includes(location.pathname)) {
       document.body.classList.add('auth-body', 'dark');
       document.documentElement.classList.add('auth-body', 'dark');
     } else {
-      document.body.classList.remove('auth-body', 'dark');
-      document.documentElement.classList.remove('auth-body', 'dark');
+      document.body.classList.remove('auth-body');
+      document.documentElement.classList.remove('auth-body');
+      
+      if (isGlobalDark) {
+        document.body.classList.add('dark');
+        document.documentElement.classList.add('dark');
+      } else {
+        document.body.classList.remove('dark');
+        document.documentElement.classList.remove('dark');
+      }
     }
   }, [location.pathname]);
 
@@ -81,7 +91,8 @@ const BottomNav = () => {
   return (
     <div className="navbar-menu border-top bg-white py-2" style={{ zIndex: 90 }}>
       <ul>
-        <li className={isActive('/shop') ? 'active' : ''}>
+        {/* 1. Trang chủ / Shop */}
+        <li className={isActive('/shop') || isActive('/landing') ? 'active' : ''}>
           <Link to="/shop">
             <div className="icon">
               <img className="unactive" src="/images/home.svg" alt="home" />
@@ -89,14 +100,16 @@ const BottomNav = () => {
             </div>
           </Link>
         </li>
-        <li className={isActive('/orders') ? 'active' : ''}>
-          <Link to="/orders">
+        {/* 2. Danh mục */}
+        <li className={isActive('/categories') ? 'active' : ''}>
+          <Link to="/categories">
             <div className="icon">
-              <img className="unactive" src="/images/categories.svg" alt="orders" />
-              <img className="active" src="/images/categories-fill.svg" alt="orders" />
+              <img className="unactive" src="/images/categories.svg" alt="categories" />
+              <img className="active" src="/images/categories-fill.svg" alt="categories" />
             </div>
           </Link>
         </li>
+        {/* 3. Giỏ hàng */}
         <li className={isActive('/cart') ? 'active' : ''}>
           <Link to="/cart" className="position-relative">
             <div className="icon">
@@ -113,6 +126,16 @@ const BottomNav = () => {
             </div>
           </Link>
         </li>
+        {/* 4. Yêu thích (Wishlist) */}
+        <li className={isActive('/wishlist') ? 'active' : ''}>
+          <Link to="/wishlist">
+            <div className="icon">
+              <img className="unactive" src="/images/heart.svg" alt="wishlist" />
+              <img className="active" src="/images/heart-fill.svg" alt="wishlist" />
+            </div>
+          </Link>
+        </li>
+        {/* 5. Hồ sơ */}
         <li className={isActive('/profile') ? 'active' : ''}>
           <Link to="/profile">
             <div className="icon">
@@ -131,7 +154,7 @@ function App() {
     <BrowserRouter>
       <ThemeManager />
       {/* Full screen layout */}
-      <div className="min-vh-100 d-flex flex-column">
+      <div className="min-vh-100 d-flex flex-column w-100">
         <div className="flex-grow-1">
           <Routes>
             <Route path="/" element={<Home />} />
@@ -143,7 +166,7 @@ function App() {
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
-            <Route path="/orders" element={<OrderTracking />} />
+            <Route path="/orders" element={<OrderHistory />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/admin" element={<AdminDashboard />} />
 
@@ -166,6 +189,7 @@ function App() {
             <Route path="/notification" element={<Notification />} />
             <Route path="/order-details" element={<OrderDetails />} />
             <Route path="/order-history" element={<OrderHistory />} />
+            <Route path="/order-tracking" element={<OrderTracking />} />
             <Route path="/other-setting" element={<OtherSetting />} />
             <Route path="/otp" element={<Otp />} />
             <Route path="/payment" element={<Payment />} />

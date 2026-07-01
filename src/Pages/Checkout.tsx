@@ -287,7 +287,7 @@ const Checkout = () => {
             </div>
 
             <div className="d-flex flex-column gap-2 px-3">
-              <Link to="/orders" className="btn btn-dark py-3 rounded-pill fw-semibold">Theo dõi đơn hàng</Link>
+              <Link to={`/order-tracking?id=${createdOrder.id}`} className="btn btn-dark py-3 rounded-pill fw-semibold">Theo dõi đơn hàng</Link>
               <Link to="/shop" className="btn btn-outline-dark py-3 rounded-pill fw-semibold">Tiếp tục mua sắm</Link>
             </div>
           </div>

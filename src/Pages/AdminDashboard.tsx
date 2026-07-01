@@ -50,13 +50,24 @@ interface Order {
   createdAt: string;
 }
 
+interface User {
+  id: string;
+  email: string;
+  name: string;
+  phone?: string;
+  dateOfBirth?: string;
+  avatar?: string;
+  createdAt: string;
+}
+
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'categories' | 'orders'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'categories' | 'orders' | 'users'>('overview');
   
   // Danh sách dữ liệu
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
 
   // Hiển thị Form CRUD dạng Modal popup
@@ -98,10 +109,23 @@ const AdminDashboard = () => {
 
       const orderRes = await apiRequest('/orders?admin=true');
       setOrders(orderRes);
+
+      const userRes = await apiRequest('/users').catch(() => []);
+      setUsers(userRes);
     } catch (e) {
       console.error('Lỗi khi tải dữ liệu tổng thể:', e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteUser = async (id: string) => {
+    if (!window.confirm('Xóa người dùng sẽ xóa tất cả đơn hàng và địa chỉ liên quan của họ. Đồng ý?')) return;
+    try {
+      await apiRequest(`/users?id=${id}`, { method: 'DELETE' });
+      fetchAllData();
+    } catch (err: any) {
+      alert(err.message || 'Lỗi khi xóa người dùng');
     }
   };
 
@@ -446,12 +470,15 @@ const AdminDashboard = () => {
       </div>
 
       {/* TAB SELECTOR NGANG (PHÙ HỢP HOÀN HẢO MÀN HÌNH DI ĐỘNG) */}
-      <div className="admin-nav-tabs mb-3">
-        <button onClick={() => { setActiveTab('overview'); }} className={`admin-tab-btn ${activeTab === 'overview' ? 'active' : ''}`}>Tổng quan</button>
-        <button onClick={() => { setActiveTab('products'); }} className={`admin-tab-btn ${activeTab === 'products' ? 'active' : ''}`}>Sản phẩm</button>
-        <button onClick={() => { setActiveTab('categories'); }} className={`admin-tab-btn ${activeTab === 'categories' ? 'active' : ''}`}>Danh mục</button>
-        <button onClick={() => { setActiveTab('orders'); }} className={`admin-tab-btn ${activeTab === 'orders' ? 'active' : ''}`}>
+      <div className="admin-nav-tabs mb-3" style={{ overflowX: 'auto', display: 'flex', whiteSpace: 'nowrap', gap: '8px', paddingBottom: '8px' }}>
+        <button onClick={() => { setActiveTab('overview'); }} className={`admin-tab-btn ${activeTab === 'overview' ? 'active' : ''}`} style={{ flexShrink: 0 }}>Tổng quan</button>
+        <button onClick={() => { setActiveTab('products'); }} className={`admin-tab-btn ${activeTab === 'products' ? 'active' : ''}`} style={{ flexShrink: 0 }}>Sản phẩm</button>
+        <button onClick={() => { setActiveTab('categories'); }} className={`admin-tab-btn ${activeTab === 'categories' ? 'active' : ''}`} style={{ flexShrink: 0 }}>Danh mục</button>
+        <button onClick={() => { setActiveTab('orders'); }} className={`admin-tab-btn ${activeTab === 'orders' ? 'active' : ''}`} style={{ flexShrink: 0 }}>
           Đơn hàng ({orders.length}) {pendingOrders > 0 && <span className="badge bg-warning text-dark ms-1" style={{ fontSize: '9px', padding: '2px 5px' }}>{pendingOrders}</span>}
+        </button>
+        <button onClick={() => { setActiveTab('users'); }} className={`admin-tab-btn ${activeTab === 'users' ? 'active' : ''}`} style={{ flexShrink: 0 }}>
+          Người dùng ({users.length})
         </button>
       </div>
 
@@ -636,6 +663,49 @@ const AdminDashboard = () => {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* 5. TAB NGƯỜI DÙNG (USER MANAGEMENT) */}
+      {activeTab === 'users' && !loading && (
+        <div className="glass-card">
+          <h4 className="fw-bold mb-3 text-white" style={{ fontSize: '14px' }}>Quản lý người dùng ({users.length})</h4>
+
+          <div className="d-flex flex-column gap-2">
+            {users.length === 0 ? (
+              <p className="text-muted text-center py-4">Chưa có người dùng nào đăng ký hệ thống.</p>
+            ) : (
+              users.map(u => (
+                <div key={u.id} className="item-row-card p-3 rounded-3 d-flex align-items-center gap-3" style={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', display: 'flex' }}>
+                  <img 
+                    src={u.avatar || "/images/profile.png"} 
+                    className="rounded-circle" 
+                    style={{ width: '42px', height: '42px', objectFit: 'cover', flexShrink: 0 }} 
+                    onError={(e) => { e.currentTarget.src = '/images/profile.png' }} 
+                  />
+                  <div className="flex-grow-1 min-width-0">
+                    <h5 className="fw-semibold text-white m-0 text-truncate" style={{ fontSize: '13px' }}>{u.name}</h5>
+                    <span className="text-muted d-block text-truncate" style={{ fontSize: '11px', marginTop: '2px' }}>{u.email}</span>
+                    {u.phone && <span className="text-muted d-block" style={{ fontSize: '10px' }}>SĐT: {u.phone}</span>}
+                  </div>
+                  <div className="d-flex flex-column align-items-end gap-1">
+                    <span className="text-muted" style={{ fontSize: '9px' }}>Tham gia: {new Date(u.createdAt).toLocaleDateString('vi-VN')}</span>
+                    {u.email !== 'admin@gmail.com' ? (
+                      <button 
+                        onClick={() => handleDeleteUser(u.id)} 
+                        className="btn btn-outline-danger btn-sm rounded-pill px-2 py-0" 
+                        style={{ fontSize: '10px', height: '22px' }}
+                      >
+                        Xóa
+                      </button>
+                    ) : (
+                      <span className="badge bg-primary text-white" style={{ fontSize: '9px' }}>Admin</span>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       )}

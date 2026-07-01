@@ -175,7 +175,7 @@ const ProductDetail = () => {
 
         {/* Rating */}
         <div className="d-flex align-items-center gap-1 mb-3">
-          <img src="images/Star.svg" alt="star" style={{ width: '14px' }} />
+          <img src="/images/Star.svg" alt="star" style={{ width: '14px' }} />
           <h6 className="m-0 fw-semibold" style={{ fontSize: '13px' }}>4.5 (86 đánh giá)</h6>
         </div>
 
